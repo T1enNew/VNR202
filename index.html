@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Cương lĩnh xây dựng đất nước trong thời kỳ quá độ lên CNXH</title>
+<style>
+:root{
+  --paper:#F3E9CF; --paper-2:#EADFBF; --paper-edge:#DCCB9F;
+  --ink:#2A2018; --ink-soft:#5C4B39; --ink-faint:#8A765C;
+  --red:#7C1614; --red-deep:#570D0C; --red-bright:#9A2320;
+  --gold:#C9A24B; --gold-bright:#E0BE68; --gold-deep:#9C7A2E;
+  --line:rgba(42,32,24,.16);
+  --serif:"Cambria","Iowan Old Style","Palatino Linotype","Georgia","Times New Roman",serif;
+  --sans:"Segoe UI","Be Vietnam Pro","Helvetica Neue",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family:var(--sans); color:var(--ink);
+  background:
+    radial-gradient(120% 90% at 50% 12%, #3a1512 0%, #2a0f0d 45%, #1a0908 100%);
+  overflow:hidden; -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- stage & book ---------- */
+.viewport{position:fixed; inset:0; display:flex; align-items:center; justify-content:center;}
+.stage{ --PW:560px; --PH:720px; width:calc(var(--PW)*2); height:var(--PH);
+  transform-origin:center center; will-change:transform;}
+.book{position:relative; width:100%; height:100%; perspective:2600px;}
+
+/* stacked page-edges to fake thickness */
+.book::before,.book::after{content:""; position:absolute; top:6px; bottom:6px; width:16px; z-index:0;
+  background:repeating-linear-gradient(90deg,#d9c9a0 0 1px,#efe4c6 1px 3px);
+  box-shadow:0 22px 50px rgba(0,0,0,.5);}
+.book::before{left:-14px; border-radius:6px 0 0 6px;}
+.book::after{right:-14px; border-radius:0 6px 6px 0;}
+
+.pageBase{position:absolute; top:0; height:100%; width:50%; overflow:hidden;
+  background:linear-gradient(var(--paper),var(--paper-2));}
+.pageBase.left{left:0; border-radius:6px 0 0 6px;
+  box-shadow:inset -26px 0 40px -26px rgba(60,40,20,.55), 0 22px 50px rgba(0,0,0,.45);}
+.pageBase.left .wm{position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:22px; opacity:.5;}
+.pageBase.left .wm .star{width:120px;height:120px;color:var(--gold-deep);opacity:.6}
+.pageBase.left .wm .vtitle{writing-mode:vertical-rl; font-family:var(--serif); letter-spacing:.28em;
+  text-transform:uppercase; font-size:14px; color:var(--ink-faint);}
+
+/* ---------- leaves (flipping pages) ---------- */
+.leaf{position:absolute; top:0; left:50%; width:50%; height:100%;
+  transform-origin:left center; transform-style:preserve-3d;
+  transition:transform .95s cubic-bezier(.4,.05,.2,1);}
+.leaf.flip{transform:rotateY(-180deg);}
+.leaf .face{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+  overflow:hidden; border-radius:0 6px 6px 0;}
+.leaf .front{background:linear-gradient(120deg,var(--paper) 0%,var(--paper-2) 100%);
+  box-shadow:inset 26px 0 40px -26px rgba(60,40,20,.5);}
+.leaf .back{transform:rotateY(180deg);
+  background:linear-gradient(-120deg,var(--paper) 0%,var(--paper-2) 100%);
+  box-shadow:inset -26px 0 40px -26px rgba(60,40,20,.5);}
+.leaf .back .bwm{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;}
+.leaf .back .bwm .star{width:150px;height:150px;color:var(--gold);opacity:.14}
+/* subtle turning shadow near the gutter */
+.leaf .front::after{content:""; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(90deg, rgba(60,40,20,.16), rgba(60,40,20,0) 14%);}
+
+/* ---------- page content ---------- */
+.pg{position:absolute; inset:0; padding:56px 54px 64px; display:flex; flex-direction:column;}
+.eyebrow{font-size:13px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold-deep); font-weight:700;
+  display:flex; align-items:center; gap:10px;}
+.eyebrow::before{content:""; width:26px; height:2px; background:var(--gold-deep);}
+.title{font-family:var(--serif); color:var(--red); font-weight:700; line-height:1.08;
+  font-size:38px; margin:16px 0 4px; text-wrap:balance;}
+.title.sm{font-size:31px;}
+.lead{font-size:18px; color:var(--ink-soft); line-height:1.5; margin-top:6px; max-width:44ch;}
+.rule{height:2px; width:70px; background:var(--gold); margin:18px 0 6px; border-radius:2px;}
+.spacer{flex:1}
+.points{list-style:none; margin:20px 0 0; padding:0; display:flex; flex-direction:column; gap:16px;}
+.points li{position:relative; padding-left:30px; font-size:22px; line-height:1.34; color:var(--ink);}
+.points li::before{content:""; position:absolute; left:2px; top:.52em; width:11px; height:11px;
+  background:var(--gold); transform:rotate(45deg); box-shadow:0 0 0 3px rgba(201,162,75,.2);}
+.points li b{color:var(--red); font-weight:700;}
+.points li small{display:block; font-size:15px; color:var(--ink-faint); line-height:1.35; margin-top:2px;}
+.callout{margin-top:16px; padding:16px 20px; border-left:4px solid var(--red);
+  background:rgba(124,22,20,.06); border-radius:0 8px 8px 0; font-family:var(--serif);
+  font-size:20px; line-height:1.4; color:var(--red-deep); font-style:italic;}
+.foot{position:absolute; left:54px; right:54px; bottom:26px; display:flex; justify-content:space-between;
+  align-items:center; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint);
+  border-top:1px solid var(--line); padding-top:10px;}
+
+/* grids */
+.grid6{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:22px;}
+.cell{background:rgba(255,255,255,.42); border:1px solid var(--line); border-radius:12px; padding:14px 14px 15px;
+  box-shadow:0 6px 14px rgba(80,50,20,.06);}
+.cell .k{font-family:var(--serif); color:var(--red); font-weight:700; font-size:18px; margin-bottom:4px;}
+.cell .v{font-size:14.5px; line-height:1.32; color:var(--ink-soft);}
+.grid8{display:grid; grid-template-columns:1fr 1fr; gap:12px 16px; margin-top:20px;}
+.pw{display:flex; gap:14px; align-items:flex-start;}
+.pw .n{flex:none; width:34px; height:34px; border-radius:50%; background:var(--red); color:var(--gold-bright);
+  font-family:var(--serif); font-weight:700; display:flex; align-items:center; justify-content:center; font-size:18px;
+  box-shadow:0 3px 8px rgba(124,22,20,.35);}
+.pw .t{font-size:16px; line-height:1.3; padding-top:3px;}
+.rel{list-style:none; margin:18px 0 0; padding:0; display:flex; flex-direction:column; gap:12px;}
+.rel li{font-size:17px; line-height:1.3; padding-left:18px; position:relative;}
+.rel li::before{content:"◆"; position:absolute; left:0; top:1px; color:var(--gold-deep); font-size:11px;}
+.rel b{color:var(--red);}
+
+/* timeline */
+.tl{display:flex; flex-direction:column; gap:18px; margin-top:26px;}
+.tl .row{display:flex; gap:18px; align-items:flex-start;}
+.tl .yr{flex:none; width:96px; text-align:right; font-family:var(--serif); color:var(--red); font-weight:700;
+  font-size:34px; line-height:1;}
+.tl .yr small{display:block; font-family:var(--sans); font-weight:600; font-size:11px; letter-spacing:.04em;
+  color:var(--ink-faint); margin-top:4px; text-transform:none;}
+.tl .dot{flex:none; position:relative; width:16px; align-self:stretch;}
+.tl .dot::before{content:""; position:absolute; left:50%; top:6px; transform:translateX(-50%);
+  width:14px; height:14px; border-radius:50%; background:var(--gold); border:3px solid var(--red); z-index:2;}
+.tl .dot::after{content:""; position:absolute; left:50%; top:6px; bottom:-18px; transform:translateX(-50%);
+  width:2px; background:var(--gold-deep); opacity:.5;}
+.tl .row:last-child .dot::after{display:none;}
+.tl .txt{font-size:17px; line-height:1.34; padding-top:4px;}
+.tl .txt b{color:var(--red);}
+
+/* red divider / cover / final variants */
+.front.red,.front.cover,.front.final{background:
+  radial-gradient(120% 100% at 30% 0%, var(--red-bright) 0%, var(--red) 42%, var(--red-deep) 100%);}
+.front.red .pg,.front.cover .pg,.front.final .pg{color:#F6E9C9;}
+.front.red::after{background:linear-gradient(90deg,rgba(0,0,0,.28),rgba(0,0,0,0) 14%);}
+.divi{height:100%; display:flex; flex-direction:column; justify-content:center; gap:8px;}
+.divi .part{font-size:14px; letter-spacing:.3em; text-transform:uppercase; color:var(--gold-bright); font-weight:700;}
+.divi .bignum{font-family:var(--serif); font-size:150px; line-height:.85; color:var(--gold-bright);
+  text-shadow:0 6px 24px rgba(0,0,0,.35); margin:6px 0 4px;}
+.divi h2{font-family:var(--serif); font-size:40px; line-height:1.05; margin:0; color:#FBF1D6; text-wrap:balance;}
+.divi p{font-size:19px; color:#EBD9AE; margin:10px 0 0; max-width:40ch; line-height:1.45;}
+
+/* cover */
+.cover-in{height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; gap:16px;}
+.cover-in .star{width:96px; height:96px; color:var(--gold-bright); filter:drop-shadow(0 6px 16px rgba(0,0,0,.4));}
+.cover-in .eb{font-size:13px; letter-spacing:.26em; text-transform:uppercase; color:var(--gold-bright); font-weight:700;}
+.cover-in h1{font-family:var(--serif); font-size:44px; line-height:1.08; margin:6px 22px 0; color:#FBF1D6; text-wrap:balance;
+  text-shadow:0 4px 18px rgba(0,0,0,.35);}
+.cover-in h1 span{display:block; color:var(--gold-bright); font-size:30px; margin-top:8px; font-weight:600;}
+.cover-in .yrs{font-family:var(--serif); font-size:22px; letter-spacing:.2em; color:#EBD9AE; margin-top:6px;}
+.cover-in .frame{position:absolute; inset:26px; border:2px solid rgba(224,190,104,.5); border-radius:8px; pointer-events:none;}
+.cover-in .hint{position:absolute; bottom:34px; left:0; right:0; font-family:var(--sans); font-size:13px;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--gold-bright); opacity:.85;
+  display:flex; gap:8px; align-items:center; justify-content:center; animation:pulse 2.4s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+.final-in{height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; gap:18px;}
+.final-in .star{width:80px;height:80px;color:var(--gold-bright)}
+.final-in h2{font-family:var(--serif); font-size:40px; color:#FBF1D6; margin:0 20px; text-wrap:balance; line-height:1.15;}
+.final-in p{color:#EBD9AE; font-size:18px; margin:0;}
+.final-in .team{margin-top:10px; font-size:14px; letter-spacing:.14em; text-transform:uppercase; color:var(--gold-bright);}
+
+/* ---------- chrome (controls) ---------- */
+.bar{position:fixed; left:0; right:0; bottom:0; height:4px; background:rgba(255,255,255,.12); z-index:40;}
+.bar > i{display:block; height:100%; width:0; background:linear-gradient(90deg,var(--gold-deep),var(--gold-bright));
+  transition:width .5s cubic-bezier(.4,.05,.2,1);}
+.ctrl{position:fixed; z-index:41; bottom:20px; left:50%; transform:translateX(-50%);
+  display:flex; align-items:center; gap:14px; padding:8px 10px; border-radius:999px;
+  background:rgba(30,12,10,.55); backdrop-filter:blur(8px); border:1px solid rgba(224,190,104,.28);
+  color:#F3E4C3; font-size:13px; letter-spacing:.06em;}
+.ctrl button{all:unset; cursor:pointer; width:34px; height:34px; border-radius:50%; display:flex;
+  align-items:center; justify-content:center; color:#F3E4C3; transition:background .2s, transform .1s;}
+.ctrl button:hover{background:rgba(224,190,104,.18);}
+.ctrl button:active{transform:scale(.92);}
+.ctrl button:focus-visible{outline:2px solid var(--gold-bright); outline-offset:2px;}
+.ctrl .count{min-width:78px; text-align:center; font-variant-numeric:tabular-nums; font-family:var(--serif);}
+.ctrl .count b{color:var(--gold-bright); font-size:16px;}
+.fs{position:fixed; top:18px; right:18px; z-index:41; all:unset; cursor:pointer;
+  width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  background:rgba(30,12,10,.5); border:1px solid rgba(224,190,104,.28); color:#F3E4C3; backdrop-filter:blur(8px);}
+.fs:hover{background:rgba(224,190,104,.18);}
+.fs:focus-visible{outline:2px solid var(--gold-bright); outline-offset:2px;}
+.toast{position:fixed; top:18px; left:50%; transform:translateX(-50%); z-index:41;
+  background:rgba(30,12,10,.6); color:#F3E4C3; border:1px solid rgba(224,190,104,.28); backdrop-filter:blur(8px);
+  padding:9px 18px; border-radius:999px; font-size:13px; letter-spacing:.05em; transition:opacity .6s; opacity:1;}
+.toast.hide{opacity:0;}
+.click-zone{position:absolute; top:0; height:100%; width:50%; z-index:800; cursor:pointer;}
+.click-zone.next{right:0;} .click-zone.prev{left:0;}
+
+@media (prefers-reduced-motion: reduce){ .leaf{transition:transform .01s linear;} .bar>i{transition:none;} .cover-in .hint{animation:none;} }
+@media (max-width:560px){ .ctrl{bottom:14px;} }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="star" viewBox="0 0 100 100">
+    <path fill="currentColor" d="M50 3l12.9 29.9 32.4 2.8-24.6 21.3 7.4 31.7L50 71.9 21.9 88.7l7.4-31.7L4.7 35.7l32.4-2.8z"/>
+  </symbol>
+</svg>
+
+<div class="viewport">
+  <div class="stage" id="stage">
+    <div class="book" id="book" aria-label="Bài thuyết trình dạng sách, dùng phím mũi tên để lật trang">
+      <div class="pageBase left">
+        <div class="wm">
+          <svg class="star"><use href="#star"/></svg>
+          <div class="vtitle">Cương lĩnh · Quá độ lên CNXH</div>
+        </div>
+      </div>
+      <!-- leaves injected here -->
+    </div>
+  </div>
+</div>
+
+<button class="fs" id="fsBtn" title="Toàn màn hình (F)" aria-label="Toàn màn hình">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V4h4M20 8V4h-4M4 16v4h4M20 16v4h-4"/></svg>
+</button>
+
+<div class="ctrl" role="group" aria-label="Điều khiển trình chiếu">
+  <button id="prev" title="Trang trước (←)" aria-label="Trang trước">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+  </button>
+  <div class="count"><b id="cur">1</b> / <span id="tot">21</span></div>
+  <button id="next" title="Trang sau (→)" aria-label="Trang sau">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+  </button>
+</div>
+
+<div class="bar"><i id="barfill"></i></div>
+<div class="toast" id="toast">Phím <b>→</b> / <b>←</b> để lật trang · <b>F</b> toàn màn hình · Bấm mép trang để chuyển</div>
+
+<script>
+const STAR = '<svg class="star"><use href="#star"/></svg>';
+
+const slides = [
+/* 0 */ {v:'cover', html:`<div class="pg"><div class="cover-in">
+    <div class="frame"></div>
+    ${STAR}
+    <div class="eb">Lịch sử Đảng Cộng sản Việt Nam · Chương 4</div>
+    <h1>Cương lĩnh xây dựng đất nước<span>trong thời kỳ quá độ lên Chủ nghĩa xã hội</span></h1>
+    <div class="yrs">1991 — nay</div>
+    <div class="hint">Lật trang để bắt đầu
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+    </div>
+  </div></div>`},
+
+/* 1 */ {v:'', html:`<div class="pg">
+    <div class="eyebrow">Nội dung trình bày</div>
+    <div class="title">Bốn phần chính</div>
+    <div class="rule"></div>
+    <ul class="points" style="margin-top:26px; gap:20px;">
+      <li><b>01 ·</b> Cương lĩnh 1991 — ra đời trong thử thách</li>
+      <li><b>02 ·</b> Đại hội X (2006) — kiểm nghiệm &amp; bổ sung</li>
+      <li><b>03 ·</b> Cương lĩnh 2011 — phát triển toàn diện <small>trọng tâm của bài</small></li>
+      <li><b>04 ·</b> Liên hệ thực tiễn — thành tựu đổi mới</li>
+    </ul>
+    <div class="foot"><span>Cương lĩnh · Quá độ lên CNXH</span><span>Mục lục</span></div>
+  </div>`},
+
+/* 2 */ {v:'red', html:`<div class="pg"><div class="divi">
+    <div class="part">Phần 01</div>
+    <div class="bignum">1991</div>
+    <h2>Cương lĩnh 1991</h2>
+    <p>Ra đời trong thử thách lịch sử — Đại hội VII của Đảng.</p>
+  </div></div>`},
+
+/* 3 */ {v:'', html:`<div class="pg">
+    <div class="eyebrow">Phần 1 · Bối cảnh ra đời</div>
+    <div class="title sm">Vì sao vẫn chọn con đường CNXH?</div>
+    <div class="rule"></div>
+    <ul class="points">
+      <li>Liên Xô – Đông Âu <b>tan rã</b> (1989–1991)</li>
+      <li>Thù địch đẩy mạnh <b>"diễn biến hòa bình"</b>, cho rằng CNXH đã "cáo chung"</li>
+      <li>Trong nước vừa qua khủng hoảng, mới bước vào <b>Đổi mới (1986)</b></li>
+    </ul>
+    <div class="callout">Đó là sự sụp đổ của <b>một mô hình</b> — không phải sự phá sản của lý tưởng XHCN.</div>
+    <div class="foot"><span>Cương lĩnh 1991</span><span>Bối cảnh</span></div>
+  </div>`},
+
+/* 4 */ {v:'', html:`<div class="pg">
+    <div class="eyebrow">Phần 1 · Nội dung cốt lõi</div>
+    <div class="title sm">6 đặc trưng của xã hội XHCN</div>
+    <div class="grid6">
+      <div class="cell"><div class="k">Chính trị</div><div class="v">Nhân dân lao động làm chủ</div></div>
+      <div class="cell"><div class="k">Kinh tế</div><div class="v">LLSX hiện đại; công hữu TLSX chủ yếu</div></div>
+      <div class="cell"><div class="k">Văn hóa</div><div class="v">Tiên tiến, đậm đà bản sắc dân tộc</div></div>
+      <div class="cell"><div class="k">Con người</div><div class="v">Được giải phóng, phát triển toàn diện</div></div>
+      <div class="cell"><div class="k">Dân tộc</div><div class="v">Bình đẳng, đoàn kết, giúp nhau tiến bộ</div></div>
+      <div class="cell"><div class="k">Đối ngoại</div><div class="v">Hữu nghị, hợp tác với các nước</div></div>
+    </div>
+    <div class="callout" style="margin-top:20px">Mục tiêu: <b>Dân giàu, nước mạnh, xã hội công bằng, văn minh.</b></div>
+    <div class="foot"><span>Cương lĩnh 1991</span><span>6 đặc trưng</span></div>
+  </div>`},
+
+/* 5 */ {v:'red', html:`<div class="pg"><div class="divi">
+    <div class="part">Phần 02</div>
+    <div class="bignum">2006</div>
+    <h2>Đại hội X</h2>
+    <p>Kiểm nghiệm &amp; bổ sung qua 20 năm thực tiễn đổi mới.</p>
+  </div></div>`},
+
+/* 6 */ {v:'', html:`<div class="pg">
+    <div class="eyebrow">Phần 2 · Điểm bổ sung nổi bật</div>
+    <div class="title sm">Đại hội X làm rõ thêm điều gì?</div>
+    <div class="rule"></div>
+    <ul class="points">
+      <li>Thêm chữ <b>"dân chủ"</b> vào mục tiêu <small>Dân giàu, nước mạnh, dân chủ, công bằng, văn minh</small></li>
+      <li>Lần đầu khẳng định <b>Nhà nước pháp quyền XHCN</b> <small>của dân, do dân, vì dân</small></li>
+      <li>Quan hệ sản xuất <b>linh hoạt</b> hơn, phù hợp trình độ lực lượng sản xuất</li>
+    </ul>
+    <div class="foot"><span>Đại hội X · 2006</span><span>Bổ sung</span></div>
+  </div>`},
+
+/* 7 */ {v:'', html:`<div class="pg">
+    <div class="eyebrow">Phần 2 · Ba nhiệm vụ then chốt</div>
+    <div class="title sm">Để thực hiện Cương lĩnh</div>
+    <div class="rule"></div>
+    <ul class="points" style="margin-top:24px; gap:22px;">
+      <li><b>1 ·</b> Xây dựng, chỉnh đốn <b>Đảng</b></li>
+      <li><b>2 ·</b> Phát huy <b>sức mạnh toàn dân tộc</b></li>
+      <li><b>3 ·</b> Đẩy mạnh <b>toàn diện</b> công cuộc đổi mới</li>
+    </ul>
+    <div class="foot"><span>Đại hội X · 2006</span><span>3 then chốt</span></div>
+  </div>`},
+
+/* 8 */ {v:'', html:`<div class="pg">
+    <div class="eyebrow">Phần 2 · Kết quả thực tiễn</div>
+    <div class="title sm">Bước ngoặt hội nhập 2006–2010</div>
+    <div class="rule"></div>
+    <ul class="points">
+      <li><b>1/2007:</b> Việt Nam gia nhập <b>WTO</b></li>
+      <li>Giao thương với <b>200</b> quốc gia &amp; vùng lãnh thổ</li>
+      <li>FDI: <b>6,84</b> → <b>19,88 tỷ USD</b> (2005 → 2010)</li>
+      <li><b>2008:</b> ra khỏi nhóm nước nghèo</li>
+    </ul>
+    <div class="foot"><span>Đại hội X · 2006</span><span>Kết quả</span></div>
+  </div>`},
+
+/* 9 */ {v:'red', html:`<div class="pg"><div class="divi">
+    <div class="part">Phần 03 · Trọng tâm</div>
+    <div class="bignum">2011</div>
+    <h2>Cương lĩnh 2011</h2>
+    <p>Bổ sung, phát triển toàn diện — Đại hội XI, Hà Nội 1/2011.</p>
+  </div></div>`},
+
+/* 10 */ {v:'', html:`<div class="pg">
+    <div class="eyebrow">Phần 3 · Bản chất</div>
+    <div class="title sm">"Bổ sung, phát triển" — không phải Cương lĩnh mới</div>
+    <div class="rule"></div>
+    <ul class="points">
+      <li><b>Kế thừa</b> toàn bộ giá trị cốt lõi của Cương lĩnh 1991</li>
+      <li>Gồm <b>4 nội dung lớn</b> <small>Cách mạng &amp; bài học · Quá độ lên CNXH · Định hướng lớn · Xây dựng Đảng</small></li>
+    </ul>
+    <div class="callout">"Theo quy luật tiến hóa của lịch sử, loài người nhất định sẽ tiến tới chủ nghĩa xã hội."</div>
+    <div class="foot"><span>Cương lĩnh 2011</span><span>Bản chất</span></div>
+  </div>`},
+
+/* 11 */ {v:'', html:`<div class="pg">
+    <div class="eyebrow">Phần 3 · Tổng kết lý luận</div>
+    <div class="title sm">5 bài học kinh nghiệm lớn</div>
+    <ul class="rel" style="margin-top:22px; gap:15px;">
+      <li>Nắm vững ngọn cờ <b>độc lập dân tộc &amp; CNXH</b></li>
+      <li>Cách mạng là <b>của dân, do dân, vì dân</b></li>
+      <li>Củng cố <b>"bốn đoàn kết"</b></li>
+      <li>Kết hợp sức mạnh <b>dân tộc &amp; thời đại</b></li>
+      <li><b>Sự lãnh đạo của Đảng</b> — nhân tố hàng đầu quyết định thắng lợi</li>
+    </ul>
+    <div class="foot"><span>Cương lĩnh 2011</span><span>5 bài học</span></div>
+  </div>`},
+
+/* 12 */ {v:'', html:`<div class="pg">
+    <div class="eyebrow">Phần 3 · Kim chỉ nam</div>
+    <div class="title sm">8 phương hướng xây dựng CNXH</div>
+    <div class="grid8">
+      <div class="pw"><div class="n">1</div><div class="t">CNH, HĐH gắn kinh tế tri thức</div></div>
+      <div class="pw"><div class="n">2</div><div class="t">Kinh tế thị trường định hướng XHCN</div></div>
+      <div class="pw"><div class="n">3</div><div class="t">Văn hóa tiên tiến; tiến bộ &amp; công bằng XH</div></div>
+      <div class="pw"><div class="n">4</div><div class="t">Vững chắc quốc phòng – an ninh</div></div>
+      <div class="pw"><div class="n">5</div><div class="t">Đối ngoại độc lập, chủ động hội nhập</div></div>
+      <div class="pw"><div class="n">6</div><div class="t">Dân chủ XHCN &amp; đại đoàn kết dân tộc</div></div>
+      <div class="pw"><div class="n">7</div><div class="t">Nhà nước pháp quyền XHCN</div></div>
+      <div class="pw"><div class="n">8</div><div class="t">Xây dựng Đảng trong sạch, vững mạnh</div></div>
+    </div>
+    <div class="foot"><span>Cương lĩnh 2011</span><span>8 phương hướng</span></div>
+  </div>`},
+
+/* 13 */ {v:'', html:`<div class="pg">
+    <div class="eyebrow">Phần 3 · Tư duy biện chứng</div>
+    <div class="title sm">8 mối quan hệ lớn cần xử lý hài hòa</div>
+    <div class="grid8" style="gap:11px 16px; margin-top:18px;">
+      <div class="pw"><div class="n">◆</div><div class="t">Đổi mới · ổn định · phát triển</div></div>
+      <div class="pw"><div class="n">◆</div><div class="t">Đổi mới kinh tế · đổi mới chính trị</div></div>
+      <div class="pw"><div class="n">◆</div><div class="t">Kinh tế thị trường · định hướng XHCN</div></div>
+      <div class="pw"><div class="n">◆</div><div class="t">Lực lượng SX · quan hệ SX</div></div>
+      <div class="pw"><div class="n">◆</div><div class="t">Tăng trưởng KT · công bằng XH</div></div>
+      <div class="pw"><div class="n">◆</div><div class="t">Xây dựng CNXH · bảo vệ Tổ quốc</div></div>
+      <div class="pw"><div class="n">◆</div><div class="t">Độc lập tự chủ · hội nhập quốc tế</div></div>
+      <div class="pw"><div class="n">◆</div><div class="t">Đảng lãnh đạo · Nhà nước quản lý · dân làm chủ</div></div>
+    </div>
+    <div class="foot"><span>Cương lĩnh 2011</span><span>8 mối quan hệ</span></div>
+  </div>`},
+
+/* 14 */ {v:'red', html:`<div class="pg"><div class="divi">
+    <div class="part">Phần 04</div>
+    <div class="bignum">Thực tiễn</div>
+    <h2>Cương lĩnh đi vào đời sống</h2>
+    <p>Lý luận được kiểm nghiệm bằng thành tựu đổi mới.</p>
+  </div></div>`},
+
+/* 15 */ {v:'', html:`<div class="pg">
+    <div class="eyebrow">Phần 4 · Kinh tế</div>
+    <div class="title sm">Minh chứng rõ nét nhất</div>
+    <div class="rule"></div>
+    <ul class="points">
+      <li>GDP: <b>205,3</b> → <b>271,2 tỷ USD</b> (2016 → 2020)</li>
+      <li>Tăng trưởng ~6%/năm; <b>2020 COVID vẫn +2,91%</b></li>
+      <li>Thu nhập đầu người <b>2.779 USD</b> <small>từ &lt; 200 USD cuối những năm 1980</small></li>
+      <li><b>2017:</b> kinh tế tư nhân là "động lực quan trọng"</li>
+    </ul>
+    <div class="foot"><span>Liên hệ thực tiễn</span><span>Kinh tế</span></div>
+  </div>`},
+
+/* 16 */ {v:'', html:`<div class="pg">
+    <div class="eyebrow">Phần 4 · Xây dựng Đảng</div>
+    <div class="title sm">Kiên quyết, không khoan nhượng</div>
+    <div class="rule"></div>
+    <ul class="points">
+      <li><b>NQ Trung ương 4</b> khóa XI (2012) &amp; XII (2016)</li>
+      <li>Chống suy thoái, <b>"tự diễn biến", "tự chuyển hóa"</b></li>
+      <li>Đấu tranh <b>phòng, chống tham nhũng</b> — bảo vệ lòng tin của nhân dân</li>
+    </ul>
+    <div class="foot"><span>Liên hệ thực tiễn</span><span>Xây dựng Đảng</span></div>
+  </div>`},
+
+/* 17 */ {v:'', html:`<div class="pg">
+    <div class="eyebrow">Phần 4 · Quốc phòng – Đối ngoại</div>
+    <div class="title sm">Giữ vững chủ quyền, chủ động hội nhập</div>
+    <div class="rule"></div>
+    <ul class="points">
+      <li><b>NQ TW8 khóa XI (2013):</b> Chiến lược bảo vệ Tổ quốc</li>
+      <li>Quan hệ ngoại giao với <b>hơn 190 quốc gia</b></li>
+      <li>Thành viên tích cực <b>ASEAN, WTO</b>; các FTA thế hệ mới</li>
+    </ul>
+    <div class="foot"><span>Liên hệ thực tiễn</span><span>QP – Đối ngoại</span></div>
+  </div>`},
+
+/* 18 */ {v:'', html:`<div class="pg">
+    <div class="eyebrow">Phần 4 · Khát vọng phát triển</div>
+    <div class="title sm">Tầm nhìn đến giữa thế kỷ XXI</div>
+    <div class="tl">
+      <div class="row"><div class="yr">2025<small>50 năm giải phóng<br>miền Nam</small></div><div class="dot"></div>
+        <div class="txt">Nước đang phát triển, công nghiệp theo hướng hiện đại, <b>vượt mức thu nhập trung bình thấp</b></div></div>
+      <div class="row"><div class="yr">2030<small>100 năm<br>thành lập Đảng</small></div><div class="dot"></div>
+        <div class="txt">Công nghiệp hiện đại, <b>thu nhập trung bình cao</b></div></div>
+      <div class="row"><div class="yr">2045<small>100 năm<br>Quốc khánh</small></div><div class="dot"></div>
+        <div class="txt">Trở thành <b>nước phát triển, thu nhập cao</b></div></div>
+    </div>
+    <div class="foot"><span>Liên hệ thực tiễn</span><span>Khát vọng 2045</span></div>
+  </div>`},
+
+/* 19 */ {v:'', html:`<div class="pg">
+    <div class="eyebrow">Phần kết</div>
+    <div class="title sm">Kiên định mục tiêu · linh hoạt phương thức</div>
+    <div class="rule"></div>
+    <ul class="points" style="gap:12px;">
+      <li>Hành trình: <b>1991 → 2006 → 2011 → nay</b></li>
+      <li>Một tư duy lý luận <b>không ngừng đổi mới</b>, luôn giữ mục tiêu cốt lõi</li>
+    </ul>
+    <div class="callout" style="font-style:normal">Câu hỏi mở: Trong <b>8 phương hướng</b> của Cương lĩnh 2011, phương hướng nào ý nghĩa nhất với thế hệ trẻ? Vì sao?</div>
+    <div class="foot"><span>Tổng kết</span><span>Câu hỏi mở</span></div>
+  </div>`},
+
+/* 20 */ {v:'final', html:`<div class="pg"><div class="final-in">
+    ${STAR}
+    <h2>Cảm ơn thầy/cô và các bạn<br>đã lắng nghe!</h2>
+    <p>Lịch sử Đảng Cộng sản Việt Nam · Chương 4</p>
+    <div class="team">Nhóm thực hiện</div>
+  </div></div>`},
+];
+
+/* ---------- build ---------- */
+const book = document.getElementById('book');
+const N = slides.length;
+document.getElementById('tot').textContent = N;
+const leaves = [];
+slides.forEach((s,i)=>{
+  const leaf = document.createElement('div');
+  leaf.className = 'leaf';
+  leaf.innerHTML =
+    `<div class="face front ${s.v}">${s.html}</div>`+
+    `<div class="face back"><div class="bwm">${STAR}</div></div>`;
+  book.appendChild(leaf);
+  leaves.push(leaf);
+});
+
+let cur = 0;          // index of the top page shown on the right
+let flippingId = -1;  // leaf currently animating (kept on top)
+
+function render(){
+  leaves.forEach((leaf,i)=>{
+    const flipped = i < cur;
+    leaf.classList.toggle('flip', flipped);
+    let z = flipped ? (500 + i) : (200 + (N - i));
+    if(i === flippingId) z = 1000;
+    leaf.style.zIndex = z;
+    leaf.setAttribute('aria-hidden', i===cur ? 'false' : 'true');
+  });
+  document.getElementById('cur').textContent = cur+1;
+  document.getElementById('barfill').style.width = (cur/(N-1)*100)+'%';
+}
+
+function go(dir){
+  const target = cur + dir;
+  if(target < 0 || target > N-1) return;
+  // the leaf that actually turns:
+  flippingId = dir > 0 ? cur : target;
+  cur = target;
+  render();
+}
+function next(){ go(1); } function prev(){ go(-1); }
+
+leaves.forEach(l=>l.addEventListener('transitionend', e=>{
+  if(e.propertyName==='transform'){ flippingId=-1; render(); }
+}));
+
+/* ---------- controls ---------- */
+document.getElementById('next').onclick = next;
+document.getElementById('prev').onclick = prev;
+
+// click zones on the pages
+const zNext = document.createElement('div'); zNext.className='click-zone next'; zNext.onclick=next;
+const zPrev = document.createElement('div'); zPrev.className='click-zone prev'; zPrev.onclick=prev;
+book.appendChild(zPrev); book.appendChild(zNext);
+
+document.addEventListener('keydown', e=>{
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ e.preventDefault(); next(); }
+  else if(e.key==='ArrowLeft'||e.key==='PageUp'){ e.preventDefault(); prev(); }
+  else if(e.key==='Home'){ cur=0; flippingId=-1; render(); }
+  else if(e.key==='End'){ cur=N-1; flippingId=-1; render(); }
+  else if(e.key==='f'||e.key==='F'){ toggleFs(); }
+});
+
+// swipe
+let sx=null;
+book.addEventListener('touchstart',e=>sx=e.touches[0].clientX,{passive:true});
+book.addEventListener('touchend',e=>{ if(sx===null)return; const dx=e.changedTouches[0].clientX-sx;
+  if(Math.abs(dx)>40){ dx<0?next():prev(); } sx=null; });
+
+// fullscreen
+function toggleFs(){ if(!document.fullscreenElement){ document.documentElement.requestFullscreen?.(); }
+  else { document.exitFullscreen?.(); } }
+document.getElementById('fsBtn').onclick = toggleFs;
+
+// scale-to-fit
+const stage = document.getElementById('stage');
+function fit(){
+  const SPREAD = 1120, PH = 720;
+  const s = Math.min((innerWidth*0.96)/SPREAD, (innerHeight*0.84)/PH);
+  stage.style.transform = `scale(${s})`;
+}
+addEventListener('resize', fit); fit();
+
+// hint toast
+setTimeout(()=>document.getElementById('toast').classList.add('hide'), 4200);
+
+render();
+</script>
+</body>
+</html>
